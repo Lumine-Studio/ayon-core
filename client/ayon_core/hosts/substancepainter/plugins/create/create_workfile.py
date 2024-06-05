@@ -21,7 +21,7 @@ class CreateWorkfile(AutoCreator):
     product_type = "workfile"
     icon = "document"
 
-    default_variant = "Main"
+    default_variant = "main"
 
     def create(self):
 
