@@ -206,7 +206,7 @@ class PrecollectInstances(pyblish.api.ContextPlugin):
             })
 
     def create_shot_instance(self, context, **data):
-        product_name = "shotMain"
+        product_name = "shot_main"
         master_layer = data.get("heroTrack")
         hierarchy_data = data.get("hierarchyData")
         item = data.get("item")
@@ -264,7 +264,7 @@ class PrecollectInstances(pyblish.api.ContextPlugin):
         return folder_path, folder_name
 
     def create_audio_instance(self, context, **data):
-        product_name = "audioMain"
+        product_name = "audio_main"
         master_layer = data.get("heroTrack")
 
         if not master_layer:

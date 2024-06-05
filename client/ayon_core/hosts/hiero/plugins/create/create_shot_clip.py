@@ -134,8 +134,14 @@ class CreateShotClip(phiero.Creator):
             "order": 3,
             "value": {
                 "productName": {
-                    "value": ["<track_name>", "main", "bg", "fg", "bg",
-                              "animatic"],
+                    "value": [
+                        "<track_name>", "main",
+                        "mp", "mpA", "mpB",
+                        "ic",
+                        "im", "imm", "in",
+                        "aux", "auxA", "auxB",
+                        "guide", "animatic"
+                        ],
                     "type": "QComboBox",
                     "label": "Product Name",
                     "target": "ui",

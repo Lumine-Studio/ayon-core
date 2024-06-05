@@ -61,13 +61,13 @@ class PrecollectWorkfile(pyblish.api.ContextPlugin):
         }
         product_type = "workfile"
         instance_data = {
-            "label": "{} - {}Main".format(
+            "label": "{} - {}_main".format(
                 folder_path, product_type),
             "name": "{}_{}".format(folder_name, product_type),
             "folderPath": folder_path,
             # TODO use 'get_product_name'
-            "productName": "{}{}Main".format(
-                folder_name, product_type.capitalize()
+            "productName": "{}_{}_main".format(
+                folder_name, product_type
             ),
             "item": project,
             "productType": product_type,
