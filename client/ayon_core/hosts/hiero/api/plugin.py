@@ -792,7 +792,7 @@ class PublishClip:
 
         # create product for publishing
         self.product_name = (
-            self.product_type + self.base_product_name.capitalize()
+            self.product_type + "_" + self.base_product_name
         )
 
     def _replace_hash_to_expression(self, name, text):
@@ -801,7 +801,6 @@ class PublishClip:
         _len = (len(_spl) - 1)
         _repl = "{{{0}:0>{1}}}".format(name, _len)
         return text.replace(("#" * _len), _repl)
-
 
     def _convert_to_tag_data(self):
         """ Convert internal data to tag data.
