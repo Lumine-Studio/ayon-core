@@ -34,24 +34,93 @@ class CreateWriteRenderAP1(napi.NukeWriteCreator):
     temp_rendering_path_template = (
         "{work}/render/{subset}/{subset}.{frame}.{ext}")
 
-    prenodes = {
-        "Reformat01": {
+    prenodes = [
+        {
             "nodeclass": "Reformat",
-            "dependent": None,
+            "dependent": "",
             "knobs": [
                 {
+                    "text": "none",
+                    "color_gui": [
+                        0,
+                        0,
+                        255
+                    ],
+                    "boolean": False,
+                    "number": 0,
+                    "decimal_number": 0,
+                    "color": [
+                        0,
+                        0,
+                        1,
+                        1
+                    ],
+                    "expression": "",
                     "type": "text",
                     "name": "resize",
-                    "value": "none"
+                    "vector_2d": {
+                        "x": 1,
+                        "y": 1
+                    },
+                    "vector_3d": {
+                        "x": 1,
+                        "y": 1,
+                        "z": 1
+                    },
+                    "box": {
+                        "x": 1,
+                        "y": 1,
+                        "r": 1,
+                        "t": 1
+                    },
+                    "formatable": {
+                        "template": "",
+                        "to_type": "Text"
+                    }
                 },
                 {
-                    "type": "bool",
+                    "text": "",
+                    "color_gui": [
+                        0,
+                        0,
+                        255
+                    ],
+                    "boolean": True,
+                    "number": 0,
+                    "decimal_number": 0,
+                    "color": [
+                        0,
+                        0,
+                        1,
+                        1
+                    ],
+                    "expression": "",
+                    "type": "boolean",
                     "name": "black_outside",
-                    "value": True
+                    "vector_2d": {
+                        "x": 1,
+                        "y": 1
+                    },
+                    "vector_3d": {
+                        "x": 1,
+                        "y": 1,
+                        "z": 1
+                    },
+                    "box": {
+                        "x": 1,
+                        "y": 1,
+                        "r": 1,
+                        "t": 1
+                    },
+                    "formatable": {
+                        "template": "",
+                        "to_type": "Text"
+                    }
                 }
-            ]
+            ],
+            "name": "Reformat01"
         }
-    }
+    ]
 
     def get_pre_create_attr_defs(self):
         attr_defs = [
@@ -140,7 +209,7 @@ class CreateWriteRenderAP1(napi.NukeWriteCreator):
             )
 
             exposed_write_knobs(
-                self.project_settings, self.__class__.__name__, instance_node
+                self.project_settings, "CreateWriteRender", instance_node
             )
 
             return instance
