@@ -1173,6 +1173,15 @@ def create_write_node(
         anatomy_filled["work"]["default"]["directory"]
     ).replace("\\", "/")
     data["work"] = fdir
+
+    try:
+        fdir_render = str(
+            anatomy_filled["work"]["work_render"]["directory"]
+        ).replace("\\","/")
+        data["work_render"] = fdir_render
+    except:
+        pass
+    
     fpath = StringTemplate(data["fpath_template"]).format_strict(data)
 
     # create directory
