@@ -26,7 +26,7 @@ class CreateWriteRenderAP0(napi.NukeWriteCreator):
         "compositing"
     ]
     temp_rendering_path_template = (
-        "{work}/render/{subset}/{subset}.{frame}.{ext}")
+        "{work_render}/render/{subset}/{subset}.{frame}.{ext}")
 
     prenodes = [
         {

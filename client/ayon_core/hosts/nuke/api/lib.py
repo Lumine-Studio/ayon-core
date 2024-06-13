@@ -2159,8 +2159,8 @@ def get_write_node_template_attr(node):
         "create_write_image": "CreateWriteImage",
         "create_write_prerender": "CreateWritePrerender",
         "create_write_render": "CreateWriteRender",
-        "create_write_render_AP0": "CreateWriteRender",
-        "create_write_render_AP1": "CreateWriteRender"
+        "create_write_render_AP0": "CreateWriteRenderAP0",
+        "create_write_render_AP1": "CreateWriteRenderAP1"
     }
     # get avalon data from node
     node_data = get_node_data(node, INSTANCE_DATA_KNOB)

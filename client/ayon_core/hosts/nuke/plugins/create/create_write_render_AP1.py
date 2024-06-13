@@ -32,7 +32,7 @@ class CreateWriteRenderAP1(napi.NukeWriteCreator):
         "groom"
     ]
     temp_rendering_path_template = (
-        "{work}/render/{subset}/{subset}.{frame}.{ext}")
+        "{work_render}/render/{subset}/{subset}.{frame}.{ext}")
 
     prenodes = [
         {
