@@ -951,12 +951,12 @@ class ExporterReviewMov(ExporterReview):
         # Knobs `meta_codec` and `mov64_codec` are not available on centos.
         # TODO shouldn't this come from settings on outputs?
         try:
-            write_node["meta_codec"].setValue("ap4h")
+            write_node["meta_codec"].setValue("apcn")
         except Exception:
             self.log.info("`meta_codec` knob was not found")
 
         try:
-            write_node["mov64_codec"].setValue("ap4h")
+            write_node["mov64_codec"].setValue("apcn")
             write_node["mov64_fps"].setValue(float(fps))
         except Exception:
             self.log.info("`mov64_codec` knob was not found")
@@ -997,7 +997,7 @@ class ExporterReviewMov(ExporterReview):
 
         self.log.debug("Representation...   `{}`".format(self.data))
 
-        self.clean_nodes(product_name)
+        # self.clean_nodes(product_name)
         nuke.scriptSave()
 
         return self.data
