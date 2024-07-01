@@ -997,7 +997,7 @@ class ExporterReviewMov(ExporterReview):
 
         self.log.debug("Representation...   `{}`".format(self.data))
 
-        # self.clean_nodes(product_name)
+        self.clean_nodes(product_name)
         nuke.scriptSave()
 
         return self.data
