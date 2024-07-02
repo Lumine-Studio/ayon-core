@@ -792,7 +792,7 @@ class PublishClip:
 
         # create product for publishing
         self.product_name = (
-            self.product_type + "_" + self.base_product_name
+            self.base_product_name + "_" + self.product_type
         )
 
     def _replace_hash_to_expression(self, name, text):
