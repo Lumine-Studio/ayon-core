@@ -28,7 +28,6 @@ class LoadEffects(load.LoaderPlugin):
     color = "white"
     ignore_attr = ["useLifetime"]
 
-
     def load(self, context, name, namespace, data):
         """
         Loading function to get the soft effects to particular read node
@@ -69,7 +68,7 @@ class LoadEffects(load.LoaderPlugin):
             "handleStart",
             "handleEnd",
             "source",
-            "author",
+            # "author",
             "fps"
         ]:
             data_imprint[k] = version_attributes[k]
@@ -189,7 +188,7 @@ class LoadEffects(load.LoaderPlugin):
             "handleStart",
             "handleEnd",
             "source",
-            "author",
+            # "author",
             "fps",
         ]:
             data_imprint[k] = version_attributes[k]
