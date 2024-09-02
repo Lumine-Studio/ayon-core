@@ -1,5 +1,7 @@
+import os
 from qtpy import QtWidgets, QtCore, QtGui
 
+from ayon_api import get_project
 from ayon_core.tools.common_models import PROJECTS_MODEL_SENDER
 
 from .lib import RefreshThread, get_qt_icon
@@ -239,6 +241,11 @@ class ProjectsQtModel(QtGui.QStandardItemModel):
         new_items = []
         for project_item in project_items:
             project_name = project_item.name
+            project_dict = get_project(
+                project_name=project_name,
+                fields={"name", "code"}
+            )
+            project_code = project_dict["code"]
             item = self._project_items.get(project_name)
             if project_item.is_library:
                 has_library_project = True
@@ -246,8 +253,15 @@ class ProjectsQtModel(QtGui.QStandardItemModel):
                 item = QtGui.QStandardItem()
                 item.setEditable(False)
                 new_items.append(item)
-            icon = get_qt_icon(project_item.icon)
-            item.setData(project_name, QtCore.Qt.DisplayRole)
+
+            ACACIA = os.getenv("ACACIA")
+
+            if ACACIA:
+                icon = self._get_project_icon_lmn(project_name)
+            else:
+                icon = get_qt_icon(project_item.icon)
+
+            item.setData(project_code, QtCore.Qt.DisplayRole)
             item.setData(icon, QtCore.Qt.DecorationRole)
             item.setData(project_name, PROJECT_NAME_ROLE)
             item.setData(project_item.active, PROJECT_IS_ACTIVE_ROLE)
@@ -275,6 +289,23 @@ class ProjectsQtModel(QtGui.QStandardItemModel):
             self._add_empty_item()
             self._remove_select_item()
             self._remove_library_sep_item()
+
+    def _get_project_icon_lmn(self, project_name):
+        project_icon_path = os.path.join(
+            os.getenv("ACACIA"),
+            "resources",
+            "Images",
+            "Projects",
+        )
+        project_icon = os.path.join(
+            project_icon_path, "{}.png".format(project_name))
+
+        if os.path.exists(project_icon):
+            return QtGui.QIcon(project_icon)
+        else:
+            return QtGui.QIcon(os.path.join(
+                project_icon_path, "default_lmn.png")
+            )
 
 
 class ProjectSortFilterProxy(QtCore.QSortFilterProxyModel):

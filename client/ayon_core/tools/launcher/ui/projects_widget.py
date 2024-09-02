@@ -41,8 +41,8 @@ class ProjectIconView(QtWidgets.QListView):
             self.setResizeMode(QtWidgets.QListView.Adjust)
             self.setWrapping(True)
             self.setWordWrap(True)
-            self.setGridSize(QtCore.QSize(151, 90))
-            self.setIconSize(QtCore.QSize(50, 50))
+            self.setGridSize(QtCore.QSize(151, 115))
+            self.setIconSize(QtCore.QSize(70, 70))
             self.setSpacing(0)
             self.setAlternatingRowColors(False)
 
@@ -50,6 +50,26 @@ class ProjectIconView(QtWidgets.QListView):
             self.style().polish(self)
 
             self.verticalScrollBar().setSingleStep(30)
+
+            self.setContentsMargins(30, 30, 30, 30)
+            self.setStyleSheet("""
+            QListView{
+                font-size: 13px;
+                font-family: poppins;
+            }
+
+            QListView:item {
+                color: #A9A9A9;
+                padding: 3px;
+
+            }
+            
+            QListView:item:hover{
+                color: #fff;
+                padding: 0px;
+            }
+            """
+                               )
 
         elif self.ListMode:
             self.setProperty("mode", "list")
@@ -59,12 +79,16 @@ class ProjectIconView(QtWidgets.QListView):
             self.setResizeMode(QtWidgets.QListView.Adjust)
             self.setWrapping(False)
             self.setWordWrap(False)
-            self.setIconSize(QtCore.QSize(20, 20))
+            self.setIconSize(QtCore.QSize(25, 25))
             self.setGridSize(QtCore.QSize(100, 25))
             self.setSpacing(0)
             self.setAlternatingRowColors(False)
 
             self.verticalScrollBar().setSingleStep(34)
+
+            self.setStyleSheet(
+                "font-size: 14px;"
+            )
 
     def mousePressEvent(self, event):
         if event.button() == QtCore.Qt.RightButton:
@@ -140,7 +164,8 @@ class ProjectsWidget(QtWidgets.QWidget):
         flags = model.flags(index)
         if not flags & QtCore.Qt.ItemIsEnabled:
             return
-        project_name = index.data(QtCore.Qt.DisplayRole)
+        # project_name = index.data(QtCore.Qt.DisplayRole)
+        project_name = index.data(QtCore.Qt.UserRole + 1)
         self._controller.set_selected_project(project_name)
 
     def _on_project_filter_change(self, text):
