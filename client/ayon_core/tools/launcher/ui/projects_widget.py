@@ -19,7 +19,7 @@ class ProjectIconView(QtWidgets.QListView):
     IconMode = 0
     ListMode = 1
 
-    def __init__(self, parent=None, mode=ListMode):
+    def __init__(self, parent=None, mode=IconMode):
         super(ProjectIconView, self).__init__(parent=parent)
 
         # Workaround for scrolling being super slow or fast when
@@ -61,7 +61,6 @@ class ProjectIconView(QtWidgets.QListView):
             QListView:item {
                 color: #A9A9A9;
                 padding: 3px;
-
             }
             
             QListView:item:hover{
@@ -94,6 +93,28 @@ class ProjectIconView(QtWidgets.QListView):
         if event.button() == QtCore.Qt.RightButton:
             self.set_mode(int(not self._mode))
         return super(ProjectIconView, self).mousePressEvent(event)
+
+    def mouseMoveEvent(self, event):
+        index = self.indexAt(event.pos())
+
+        if index.isValid():
+            for item in range(self.model().rowCount()):
+
+                index_other = self.model().index(item, 0)
+                gray_data = index_other.data(QtCore.Qt.DecorationRole + 30)
+                self.model().setData(index_other,
+                                     gray_data,
+                                     QtCore.Qt.DecorationRole
+                                     )
+
+            original_data = index.data(QtCore.Qt.DecorationRole + 31)
+            self.model().setData(
+                index,
+                original_data,
+                QtCore.Qt.DecorationRole
+            )
+
+        super().mouseMoveEvent(event)
 
 
 class ProjectsWidget(QtWidgets.QWidget):

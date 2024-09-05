@@ -257,12 +257,15 @@ class ProjectsQtModel(QtGui.QStandardItemModel):
             ACACIA = os.getenv("ACACIA")
 
             if ACACIA:
-                icon = self._get_project_icon_lmn(project_name)
+                icon, icon_gray = self._get_project_icon_lmn(project_name)
             else:
                 icon = get_qt_icon(project_item.icon)
+                icon_gray = icon
 
             item.setData(project_code, QtCore.Qt.DisplayRole)
-            item.setData(icon, QtCore.Qt.DecorationRole)
+            item.setData(icon_gray, QtCore.Qt.DecorationRole)
+            item.setData(icon_gray, QtCore.Qt.DecorationRole + 30)
+            item.setData(icon, QtCore.Qt.DecorationRole + 31)
             item.setData(project_name, PROJECT_NAME_ROLE)
             item.setData(project_item.active, PROJECT_IS_ACTIVE_ROLE)
             item.setData(project_item.is_library, PROJECT_IS_LIBRARY_ROLE)
@@ -300,12 +303,24 @@ class ProjectsQtModel(QtGui.QStandardItemModel):
         project_icon = os.path.join(
             project_icon_path, "{}.png".format(project_name))
 
-        if os.path.exists(project_icon):
-            return QtGui.QIcon(project_icon)
-        else:
-            return QtGui.QIcon(os.path.join(
+        if not os.path.exists(project_icon):
+            project_icon = os.path.join(
                 project_icon_path, "default_lmn.png")
-            )
+
+        icon = QtGui.QIcon()
+        icon_gray = QtGui.QIcon()
+        original_icon = QtGui.QPixmap(project_icon)
+
+        icon.addPixmap(original_icon, QtGui.QIcon.Selected, QtGui.QIcon.On)
+
+        gray_icon = icon.pixmap(
+            original_icon.size(),
+            QtGui.QIcon.Disabled,
+            QtGui.QIcon.On
+        )
+        icon_gray.addPixmap(gray_icon, QtGui.QIcon.Normal, QtGui.QIcon.On)
+
+        return icon, icon_gray
 
 
 class ProjectSortFilterProxy(QtCore.QSortFilterProxyModel):
