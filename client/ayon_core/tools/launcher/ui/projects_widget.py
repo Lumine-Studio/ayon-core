@@ -42,7 +42,7 @@ class ProjectIconView(QtWidgets.QListView):
             self.setWrapping(True)
             self.setWordWrap(True)
             self.setGridSize(QtCore.QSize(161, 125))
-            self.setIconSize(QtCore.QSize(90, 90))
+            self.setIconSize(QtCore.QSize(80, 80))
             self.setSpacing(0)
             self.setAlternatingRowColors(False)
 
