@@ -41,8 +41,8 @@ class ProjectIconView(QtWidgets.QListView):
             self.setResizeMode(QtWidgets.QListView.Adjust)
             self.setWrapping(True)
             self.setWordWrap(True)
-            self.setGridSize(QtCore.QSize(151, 115))
-            self.setIconSize(QtCore.QSize(70, 70))
+            self.setGridSize(QtCore.QSize(161, 125))
+            self.setIconSize(QtCore.QSize(90, 90))
             self.setSpacing(0)
             self.setAlternatingRowColors(False)
 
@@ -51,24 +51,24 @@ class ProjectIconView(QtWidgets.QListView):
 
             self.verticalScrollBar().setSingleStep(30)
 
-            self.setContentsMargins(30, 30, 30, 30)
-            self.setStyleSheet("""
-            QListView{
-                font-size: 13px;
-                font-family: poppins;
-            }
+            self.setStyleSheet(
+                """
+                QListView{
+                    font-size: 13px;
+                    font-family: poppins;
+                }
 
-            QListView:item {
-                color: #A9A9A9;
-                padding: 3px;
-            }
-            
-            QListView:item:hover{
-                color: #fff;
-                padding: 0px;
-            }
+                QListView:item {
+                    color: #A9A9A9;
+                    padding: 3px;
+                }
+                
+                QListView:item:hover{
+                    color: #fff;
+                    padding: 0px;
+                }
             """
-                               )
+            )
 
         elif self.ListMode:
             self.setProperty("mode", "list")
