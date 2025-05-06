@@ -19,7 +19,7 @@ class ProjectIconView(QtWidgets.QListView):
     IconMode = 0
     ListMode = 1
 
-    def __init__(self, parent=None, mode=ListMode):
+    def __init__(self, parent=None, mode=IconMode):
         super(ProjectIconView, self).__init__(parent=parent)
 
         # Workaround for scrolling being super slow or fast when
@@ -41,8 +41,8 @@ class ProjectIconView(QtWidgets.QListView):
             self.setResizeMode(QtWidgets.QListView.Adjust)
             self.setWrapping(True)
             self.setWordWrap(True)
-            self.setGridSize(QtCore.QSize(151, 90))
-            self.setIconSize(QtCore.QSize(50, 50))
+            self.setGridSize(QtCore.QSize(161, 125))
+            self.setIconSize(QtCore.QSize(80, 80))
             self.setSpacing(0)
             self.setAlternatingRowColors(False)
 
@@ -50,6 +50,25 @@ class ProjectIconView(QtWidgets.QListView):
             self.style().polish(self)
 
             self.verticalScrollBar().setSingleStep(30)
+
+            self.setStyleSheet(
+                """
+                QListView{
+                    font-size: 13px;
+                    font-family: poppins;
+                }
+
+                QListView:item {
+                    color: #A9A9A9;
+                    padding: 3px;
+                }
+                
+                QListView:item:hover{
+                    color: #fff;
+                    padding: 0px;
+                }
+            """
+            )
 
         elif self.ListMode:
             self.setProperty("mode", "list")
@@ -59,17 +78,43 @@ class ProjectIconView(QtWidgets.QListView):
             self.setResizeMode(QtWidgets.QListView.Adjust)
             self.setWrapping(False)
             self.setWordWrap(False)
-            self.setIconSize(QtCore.QSize(20, 20))
+            self.setIconSize(QtCore.QSize(25, 25))
             self.setGridSize(QtCore.QSize(100, 25))
             self.setSpacing(0)
             self.setAlternatingRowColors(False)
 
             self.verticalScrollBar().setSingleStep(34)
 
+            self.setStyleSheet(
+                "font-size: 14px;"
+            )
+
     def mousePressEvent(self, event):
         if event.button() == QtCore.Qt.RightButton:
             self.set_mode(int(not self._mode))
         return super(ProjectIconView, self).mousePressEvent(event)
+
+    def mouseMoveEvent(self, event):
+        index = self.indexAt(event.pos())
+
+        if index.isValid():
+            for item in range(self.model().rowCount()):
+
+                index_other = self.model().index(item, 0)
+                gray_data = index_other.data(QtCore.Qt.DecorationRole + 30)
+                self.model().setData(index_other,
+                                     gray_data,
+                                     QtCore.Qt.DecorationRole
+                                     )
+
+            original_data = index.data(QtCore.Qt.DecorationRole + 31)
+            self.model().setData(
+                index,
+                original_data,
+                QtCore.Qt.DecorationRole
+            )
+
+        super().mouseMoveEvent(event)
 
 
 class ProjectsWidget(QtWidgets.QWidget):
@@ -140,7 +185,8 @@ class ProjectsWidget(QtWidgets.QWidget):
         flags = model.flags(index)
         if not flags & QtCore.Qt.ItemIsEnabled:
             return
-        project_name = index.data(QtCore.Qt.DisplayRole)
+        # project_name = index.data(QtCore.Qt.DisplayRole)
+        project_name = index.data(QtCore.Qt.UserRole + 1)
         self._controller.set_selected_project(project_name)
 
     def _on_project_filter_change(self, text):
