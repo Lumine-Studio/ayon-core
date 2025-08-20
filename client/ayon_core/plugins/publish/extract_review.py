@@ -97,6 +97,7 @@ class ExtractReview(pyblish.api.InstancePlugin):
         "flame",
         "unreal",
         "circuit",
+        "gaffer",
     ]
 
     # Supported extensions
@@ -450,11 +451,11 @@ class ExtractReview(pyblish.api.InstancePlugin):
                     if new_frame_files is None:
                         new_frame_files = (
                             self.fill_sequence_gaps_from_existing(
-                            collection=collection,
-                            staging_dir=new_repre["stagingDir"],
-                            start_frame=temp_data["frame_start"],
-                            end_frame=temp_data["frame_end"],
-                        ))
+                                collection=collection,
+                                staging_dir=new_repre["stagingDir"],
+                                start_frame=temp_data["frame_start"],
+                                end_frame=temp_data["frame_end"],
+                            ))
                 elif fill_missing_frames == "only_rendered":
                     temp_data["explicit_input_paths"] = [
                         os.path.join(

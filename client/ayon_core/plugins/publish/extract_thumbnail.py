@@ -41,6 +41,7 @@ class ExtractThumbnail(pyblish.api.InstancePlugin):
         "unreal",
         "houdini",
         "circuit",
+        "gaffer",
     ]
     enabled = False
 
