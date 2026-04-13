@@ -1,3 +1,4 @@
+import os
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from collections.abc import Callable
@@ -6,6 +7,7 @@ from typing import Optional
 
 from qtpy import QtWidgets, QtCore, QtGui
 
+from ayon_api import get_project
 from ayon_core.tools.common_models import (
     ProjectItem,
     PROJECTS_MODEL_SENDER,
@@ -287,6 +289,11 @@ class ProjectsQtModel(QtGui.QStandardItemModel):
         new_items = []
         for project_item in project_items:
             project_name = project_item.name
+            project_dict = get_project(
+                project_name=project_name,
+                fields={"name", "code"}
+            )
+            project_code = project_dict["code"]
             item = self._project_items.get(project_name)
             if project_item.is_library:
                 has_library_project = True
@@ -294,9 +301,19 @@ class ProjectsQtModel(QtGui.QStandardItemModel):
                 item = QtGui.QStandardItem()
                 item.setEditable(False)
                 new_items.append(item)
-            icon = get_qt_icon(project_item.icon)
-            item.setData(project_name, QtCore.Qt.DisplayRole)
-            item.setData(icon, QtCore.Qt.DecorationRole)
+
+            ACACIA = os.getenv("ACACIA")
+
+            if ACACIA:
+                icon, icon_gray = self._get_project_icon_lmn(project_name)
+            else:
+                icon = get_qt_icon(project_item.icon)
+                icon_gray = icon
+
+            item.setData(project_code, QtCore.Qt.DisplayRole)
+            item.setData(icon_gray, QtCore.Qt.DecorationRole)
+            item.setData(icon_gray, QtCore.Qt.DecorationRole + 30)
+            item.setData(icon, QtCore.Qt.DecorationRole + 31)
             item.setData(project_name, PROJECT_NAME_ROLE)
             item.setData(project_item.active, PROJECT_IS_ACTIVE_ROLE)
             item.setData(project_item.is_library, PROJECT_IS_LIBRARY_ROLE)
@@ -324,6 +341,35 @@ class ProjectsQtModel(QtGui.QStandardItemModel):
             self._add_empty_item()
             self._remove_select_item()
             self._remove_library_sep_item()
+
+    def _get_project_icon_lmn(self, project_name):
+        project_icon_path = os.path.join(
+            os.getenv("ACACIA"),
+            "resources",
+            "Images",
+            "Projects",
+        )
+        project_icon = os.path.join(
+            project_icon_path, "{}.png".format(project_name))
+
+        if not os.path.exists(project_icon):
+            project_icon = os.path.join(
+                project_icon_path, "default_lmn.png")
+
+        icon = QtGui.QIcon()
+        icon_gray = QtGui.QIcon()
+        original_icon = QtGui.QPixmap(project_icon)
+
+        icon.addPixmap(original_icon, QtGui.QIcon.Selected, QtGui.QIcon.On)
+
+        gray_icon = icon.pixmap(
+            original_icon.size(),
+            QtGui.QIcon.Disabled,
+            QtGui.QIcon.On
+        )
+        icon_gray.addPixmap(gray_icon, QtGui.QIcon.Normal, QtGui.QIcon.On)
+
+        return icon, icon_gray
 
 
 class ProjectSortFilterProxy(QtCore.QSortFilterProxyModel):

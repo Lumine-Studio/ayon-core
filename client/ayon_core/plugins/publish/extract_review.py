@@ -166,6 +166,8 @@ class ExtractReview(pyblish.api.InstancePlugin):
         "photoshop",
         "substancepainter",
         "workflow",
+        "circuit",
+        "gaffer",
     ]
 
     settings_category = "core"

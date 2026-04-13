@@ -265,7 +265,9 @@ def _product_types_enum():
         "workfile",
         "xgen",
         "yetiRig",
-        "yeticache"
+        "yeticache",
+        "texture",
+        "effect"
     ]
 
 
