@@ -1,9 +1,10 @@
-import os
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from collections.abc import Callable
 import typing
 from typing import Optional
+
+import os
 
 from qtpy import QtWidgets, QtCore, QtGui
 
