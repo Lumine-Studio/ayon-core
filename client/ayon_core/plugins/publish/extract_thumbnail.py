@@ -110,6 +110,8 @@ class ExtractThumbnail(pyblish.api.InstancePlugin):
         "unreal",
         "houdini",
         "batchdelivery",
+        "circuit",
+        "gaffer",
         "workflow",
     ]
     settings_category = "core"
