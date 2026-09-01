@@ -36,6 +36,14 @@ PROJECT_IS_LIBRARY_ROLE = QtCore.Qt.UserRole + 3
 PROJECT_IS_CURRENT_ROLE = QtCore.Qt.UserRole + 4
 PROJECT_IS_PINNED_ROLE = QtCore.Qt.UserRole + 5
 LIBRARY_PROJECT_SEPARATOR_ROLE = QtCore.Qt.UserRole + 6
+# Both variants of project icon, decoration is swapped between them on hover
+PROJECT_GRAY_ICON_ROLE = QtCore.Qt.DecorationRole + 30
+PROJECT_COLOR_ICON_ROLE = QtCore.Qt.DecorationRole + 31
+
+# Size of project rows in launcher projects list
+PROJECTS_ICON_SIZE = 56
+PROJECTS_ROW_HEIGHT = 60
+PROJECTS_FONT_SIZE = 14
 
 
 class AbstractProjectController(ABC):
@@ -314,8 +322,8 @@ class ProjectsQtModel(QtGui.QStandardItemModel):
 
             item.setData(project_code, QtCore.Qt.DisplayRole)
             item.setData(icon_gray, QtCore.Qt.DecorationRole)
-            item.setData(icon_gray, QtCore.Qt.DecorationRole + 30)
-            item.setData(icon, QtCore.Qt.DecorationRole + 31)
+            item.setData(icon_gray, PROJECT_GRAY_ICON_ROLE)
+            item.setData(icon, PROJECT_COLOR_ICON_ROLE)
             item.setData(project_name, PROJECT_NAME_ROLE)
             item.setData(project_item.active, PROJECT_IS_ACTIVE_ROLE)
             item.setData(project_item.is_library, PROJECT_IS_LIBRARY_ROLE)
@@ -476,16 +484,17 @@ class ProjectSortFilterProxy(QtCore.QSortFilterProxyModel):
         if index.data(PROJECT_IS_CURRENT_ROLE):
             return True
 
-        default = super().filterAcceptsRow(source_row, source_parent)
-        if not default:
-            return default
-
         string_pattern = self.filterRegularExpression().pattern()
-        if (
-            string_pattern
-            and string_pattern.lower() not in project_name.lower()
-        ):
-            return False
+        if string_pattern:
+            # Project code is displayed, but project can be found by both
+            #   its code and its name
+            string_pattern = string_pattern.lower()
+            project_code = index.data(QtCore.Qt.DisplayRole) or ""
+            if (
+                string_pattern not in project_name.lower()
+                and string_pattern not in project_code.lower()
+            ):
+                return False
 
         if (
             self._filter_inactive
@@ -897,6 +906,26 @@ class ProjectsWidget(QtWidgets.QWidget):
         projects_view.setWrapping(False)
         projects_view.setWordWrap(False)
         projects_view.setSpacing(0)
+        projects_view.setIconSize(QtCore.QSize(
+            PROJECTS_ICON_SIZE, PROJECTS_ICON_SIZE
+        ))
+        # Row height and font size are defined by global stylesheet, which
+        #   is too small for project icons. Widget stylesheet has priority
+        #   over the application one.
+        projects_view.setStyleSheet(
+            "QListView::item {"
+            f" height: {PROJECTS_ROW_HEIGHT}px;"
+            " padding: 2px 0px 2px 4px;"
+            "}"
+            f"QListView {{ font-size: {PROJECTS_FONT_SIZE}pt; }}"
+        )
+        # Font defined by widget stylesheet resets antialiasing set on
+        #   application font, so it must be set again on the widget
+        projects_font = projects_view.font()
+        projects_font.setStyleStrategy(
+            QtGui.QFont.PreferAntialias | QtGui.QFont.NoSubpixelAntialias
+        )
+        projects_view.setFont(projects_font)
         projects_delegate = ProjectsDelegate(projects_view)
         projects_view.setItemDelegate(projects_delegate)
         projects_view.activate_flick_charm()
@@ -928,6 +957,51 @@ class ProjectsWidget(QtWidgets.QWidget):
         self._projects_model = projects_model
         self._projects_proxy_model = projects_proxy_model
         self._projects_delegate = projects_delegate
+
+        self._hovered_index = QtCore.QPersistentModelIndex()
+        # Mouse events are received by viewport, not by the view itself
+        projects_view.viewport().installEventFilter(self)
+        projects_view.setMouseTracking(True)
+
+    def eventFilter(self, obj, event):
+        if obj is not self._projects_view.viewport():
+            return super().eventFilter(obj, event)
+
+        event_type = event.type()
+        if event_type == QtCore.QEvent.MouseMove:
+            self._set_hovered_index(
+                self._projects_view.indexAt(event.pos())
+            )
+        elif event_type == QtCore.QEvent.Leave:
+            self._set_hovered_index(QtCore.QModelIndex())
+        return super().eventFilter(obj, event)
+
+    def _set_hovered_index(self, index):
+        """Show colored project icon only for project under mouse.
+
+        Model keeps both variants of project icon, grayscale is used as
+            default decoration.
+
+        """
+        if QtCore.QPersistentModelIndex(index) == self._hovered_index:
+            return
+
+        model = self._projects_proxy_model
+        prev_index = QtCore.QModelIndex(self._hovered_index)
+        if prev_index.isValid():
+            model.setData(
+                prev_index,
+                prev_index.data(PROJECT_GRAY_ICON_ROLE),
+                QtCore.Qt.DecorationRole
+            )
+
+        if index.isValid():
+            model.setData(
+                index,
+                index.data(PROJECT_COLOR_ICON_ROLE),
+                QtCore.Qt.DecorationRole
+            )
+        self._hovered_index = QtCore.QPersistentModelIndex(index)
 
     def refresh(self):
         self._projects_model.refresh()
