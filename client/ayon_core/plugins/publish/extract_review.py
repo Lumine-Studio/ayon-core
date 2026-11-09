@@ -163,7 +163,9 @@ class ExtractReview(pyblish.api.InstancePlugin):
         "flame",
         "unreal",
         "batchdelivery",
-        "photoshop"
+        "photoshop",
+        "circuit",
+        "gaffer",
     ]
 
     settings_category = "core"
