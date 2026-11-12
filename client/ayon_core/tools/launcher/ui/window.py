@@ -17,7 +17,7 @@ from ayon_core.ui.components import (
     AYButton,
 )
 
-from .hierarchy_page import HierarchyPage
+from .hierarchy_page import HierarchyPage, is_workfiles_page_enabled
 from .actions_widget import ActionsWidget
 
 LAUNCHER_CSS_PATH = Path(__file__).parent / "launcher_style.css"
@@ -122,7 +122,7 @@ class LauncherWindow(AYContainer):
         # for the pages so that is the only one that
         # stretches on UI resize.
         content_body.setStretchFactor(0, 10)
-        content_body.setSizes([580, 160])
+        content_body.setSizes([470, 150])
 
         # Use AYContainer's add_widget instead of manual layout
         self.add_widget(content_body)
@@ -198,7 +198,11 @@ class LauncherWindow(AYContainer):
         self._page_slide_anim = page_slide_anim
 
         hierarchy_page.setVisible(not self._is_on_projects_page)
-        self.resize(1100, 740)
+        # Workfiles page needs a third column of space in hierarchy page
+        if is_workfiles_page_enabled():
+            self.resize(1100, 740)
+        else:
+            self.resize(720, 720)
 
     def showEvent(self, event):
         super().showEvent(event)

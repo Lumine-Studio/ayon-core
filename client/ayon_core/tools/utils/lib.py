@@ -192,6 +192,17 @@ def get_qt_app():
 
         app = QtWidgets.QApplication(sys.argv)
 
+        # Subpixel antialiasing gives text colored edges, which is well
+        #   visible on dark background of AYON UI. Antialiasing can't be
+        #   defined by stylesheet, but is inherited from application font.
+        # NOTE Applied only to application created by AYON, font of host
+        #   application must stay untouched.
+        font = app.font()
+        font.setStyleStrategy(
+            QtGui.QFont.PreferAntialias | QtGui.QFont.NoSubpixelAntialias
+        )
+        app.setFont(font)
+
     return app
 
 

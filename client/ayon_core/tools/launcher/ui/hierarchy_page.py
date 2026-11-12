@@ -1,5 +1,6 @@
 from qtpy import QtWidgets, QtCore
 
+from ayon_core.lib import env_value_to_bool
 from ayon_core.tools.utils import (
     ProjectsCombobox,
     FoldersWidget,
@@ -13,6 +14,14 @@ from ayon_core.ui.components import (
 )
 
 from .workfiles_page import WorkfilesPage
+
+# Workfiles are listed based on workfile entities on server. Studios that
+#   don't have them can disable the page and select context up to task only.
+DISABLE_WORKFILES_ENV_KEY = "AYON_LAUNCHER_DISABLE_WORKFILES"
+
+
+def is_workfiles_page_enabled() -> bool:
+    return not env_value_to_bool(DISABLE_WORKFILES_ENV_KEY, default=False)
 
 
 class LauncherFoldersWidget(FoldersWidget):
@@ -99,14 +108,17 @@ class HierarchyPage(QtWidgets.QWidget):
         tasks_widget.set_status_column_visible(True)
 
         # - Third page - Workfiles
-        workfiles_page = WorkfilesPage(controller, content_body)
+        workfiles_page = None
+        if is_workfiles_page_enabled():
+            workfiles_page = WorkfilesPage(controller, content_body)
 
         content_body.addWidget(folders_widget)
         content_body.addWidget(tasks_widget)
-        content_body.addWidget(workfiles_page)
         content_body.setStretchFactor(0, 120)
-        content_body.setStretchFactor(1, 110)
-        content_body.setStretchFactor(2, 220)
+        content_body.setStretchFactor(1, 85)
+        if workfiles_page is not None:
+            content_body.addWidget(workfiles_page)
+            content_body.setStretchFactor(2, 220)
 
         main_layout = AYVBoxLayout(self, margin=0, spacing=4)
         main_layout.addWidget(header_widget, 0)
@@ -119,8 +131,9 @@ class HierarchyPage(QtWidgets.QWidget):
         filters_widget.my_tasks_changed.connect(
             self._on_my_tasks_checkbox_state_changed
         )
-        folders_widget.focused_in.connect(self._on_folders_focus)
-        tasks_widget.focused_in.connect(self._on_tasks_focus)
+        if workfiles_page is not None:
+            folders_widget.focused_in.connect(self._on_folders_focus)
+            tasks_widget.focused_in.connect(self._on_tasks_focus)
 
         self._is_visible = False
         self._controller = controller
@@ -158,7 +171,8 @@ class HierarchyPage(QtWidgets.QWidget):
     def refresh(self):
         self._folders_widget.refresh()
         self._tasks_widget.refresh()
-        self._workfiles_page.refresh()
+        if self._workfiles_page is not None:
+            self._workfiles_page.refresh()
         # Update my tasks
         self._on_my_tasks_checkbox_state_changed(
             self._filters_widget.is_my_tasks_checked()
@@ -187,7 +201,9 @@ class HierarchyPage(QtWidgets.QWidget):
         self._tasks_widget.set_task_ids_filter(task_ids)
 
     def _on_folders_focus(self):
-        self._workfiles_page.deselect()
+        if self._workfiles_page is not None:
+            self._workfiles_page.deselect()
 
     def _on_tasks_focus(self):
-        self._workfiles_page.deselect()
+        if self._workfiles_page is not None:
+            self._workfiles_page.deselect()
