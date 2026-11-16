@@ -13,7 +13,11 @@ speedcopy = "^2.2"
 six = "^1.15"
 qtawesome = "0.7.3"
 structlog = "^25.5"  # last version supporting python 3.9
-websocket-client = ">=1.7.0,<2"
+# Upstream pins ">=1.7.0,<2", but every release of ftrack-python-api
+#   caps websocket-client at "<1", so the two cannot resolve together.
+#   Core only uses ABNF, WebSocketTimeoutException, create_connection
+#   and _http._get_addrinfo_list, all present in 0.59.0.
+websocket-client = ">=0.40.0,<2"
 
 [ayon.runtimeDependencies]
 aiohttp-middlewares = "^2.0.0"
