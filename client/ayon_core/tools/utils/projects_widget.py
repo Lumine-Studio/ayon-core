@@ -744,6 +744,33 @@ class ProjectsTreeDelegate(_ProjectsPinMixin, TreeViewItemDelegate):
         self._paint_pin_icon(painter, option, index)
 
 
+class LMNProjectsTreeDelegate(ProjectsTreeDelegate):
+    """Projects tree delegate with bigger rows and font for project icons.
+
+    Row height and font of tree view items are defined by AYON style data
+        and painted by the delegate, so stylesheet of the view is ignored.
+        Default sizes are too small for project icons.
+    """
+
+    def sizeHint(self, option, index):
+        size = super().sizeHint(option, index)
+        if index.data(PROJECT_ITEM_TYPE) == ProjectItemType.PinSeparator:
+            return size
+        return QtCore.QSize(size.width(), PROJECTS_ROW_HEIGHT)
+
+    def initStyleOption(self, option, index):
+        super().initStyleOption(option, index)
+        font = QtGui.QFont(option.font)
+        font.setPointSize(PROJECTS_FONT_SIZE)
+        # Subpixel antialiasing gives text colored edges, which is well
+        #   visible on dark background of AYON UI
+        font.setStyleStrategy(
+            QtGui.QFont.PreferAntialias | QtGui.QFont.NoSubpixelAntialias
+        )
+        option.font = font
+        option.fontMetrics = QtGui.QFontMetrics(font)
+
+
 class ProjectsComboBoxDelegate(_ProjectsPinMixin, ComboBoxItemDelegate):
     """Combobox delegate with pin icon and thumbnail support."""
 
@@ -1025,35 +1052,17 @@ class ProjectsWidget(QtWidgets.QWidget):
 
         # Set custom delegate for tree view items
         ayon_style = get_ayon_style()
-        projects_delegate = ProjectsTreeDelegate(
+        projects_delegate = LMNProjectsTreeDelegate(
             parent=projects_view,
             style_model=ayon_style.model,
             variant=projects_view._variant_str
         )
         projects_view.setAlternatingRowColors(False)
-        projects_view.setWrapping(False)
         projects_view.setWordWrap(False)
-        projects_view.setSpacing(0)
+        # Row height and font are defined by the delegate
         projects_view.setIconSize(QtCore.QSize(
             PROJECTS_ICON_SIZE, PROJECTS_ICON_SIZE
         ))
-        # Row height and font size are defined by global stylesheet, which
-        #   is too small for project icons. Widget stylesheet has priority
-        #   over the application one.
-        projects_view.setStyleSheet(
-            "QListView::item {"
-            f" height: {PROJECTS_ROW_HEIGHT}px;"
-            " padding: 2px 0px 2px 4px;"
-            "}"
-            f"QListView {{ font-size: {PROJECTS_FONT_SIZE}pt; }}"
-        )
-        # Font defined by widget stylesheet resets antialiasing set on
-        #   application font, so it must be set again on the widget
-        projects_font = projects_view.font()
-        projects_font.setStyleStrategy(
-            QtGui.QFont.PreferAntialias | QtGui.QFont.NoSubpixelAntialias
-        )
-        projects_view.setFont(projects_font)
         projects_view.setItemDelegate(projects_delegate)
 
         # Thumbnails are painted on the left side of pin icon
